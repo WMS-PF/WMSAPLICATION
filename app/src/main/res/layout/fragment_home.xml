@@ -7,16 +7,157 @@
     tools:context=".ui.home.HomeFragment">
 
     <TextView
-        android:id="@+id/text_home"
+        android:id="@+id/weight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="16dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/productID" />
+
+    <TextView
+        android:id="@+id/mult2"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="436dp"
+        android:text="@string/multiplier"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/width"
+        app:layout_constraintStart_toEndOf="@+id/length"
+        app:layout_constraintTop_toBottomOf="@+id/weight"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/width"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="348dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonScan"
+        app:layout_constraintEnd_toStartOf="@+id/mult"
+        app:layout_constraintStart_toEndOf="@+id/mult2"
+        app:layout_constraintTop_toBottomOf="@+id/weight"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/mult"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="436dp"
+        android:text="@string/multiplier"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/heigth"
+        app:layout_constraintStart_toEndOf="@+id/width"
+        app:layout_constraintTop_toBottomOf="@+id/weight"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/length"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="436dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/mult2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/weight"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/heigth"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="436dp"
         android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/mult"
+        app:layout_constraintTop_toBottomOf="@+id/weight"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/productID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/weight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/brand" />
+
+    <TextView
+        android:id="@+id/productName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/brand"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/brand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/productID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/productName"
+        app:layout_constraintVertical_bias="0.011" />
+
+    <Button
+        android:id="@+id/buttonScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/Scan"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.951" />
 </androidx.constraintlayout.widget.ConstraintLayout>
