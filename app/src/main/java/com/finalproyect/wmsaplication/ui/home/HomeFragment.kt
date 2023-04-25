@@ -63,7 +63,10 @@ class HomeFragment : Fragment() {
         }
     }
     private fun scanFromFragment() {
-        fragmentLauncher.launch(ScanOptions())
+        val options = ScanOptions()
+        options.setOrientationLocked(true)
+        options.setBeepEnabled(true)
+        fragmentLauncher.launch(options)
     }
 
     private fun getInfo(productId: String){

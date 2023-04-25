@@ -2,7 +2,6 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 }
-
 android {
     namespace 'com.finalproyect.wmsaplication'
     compileSdk 33
@@ -32,6 +31,10 @@ android {
     }
     buildFeatures {
         viewBinding true
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.0"
     }
 }
 
@@ -51,4 +54,8 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0@aar'
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.android.volley:volley:1.2.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation "androidx.compose.compiler:compiler:1.4.6"
+    //noinspection GradleDependency
+    implementation 'androidx.compose.runtime:runtime:1.4.0'
 }

@@ -13,4 +13,6 @@
     <string name="SCAN">Scan</string>
     <string name="Scan">Scan\n</string>
     <string name="multiplier">X</string>
+    <string name="Inbond">In bond</string>
+    <string name="Nacional">Nacional</string>
 </resources>
