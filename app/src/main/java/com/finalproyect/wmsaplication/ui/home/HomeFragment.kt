@@ -91,22 +91,20 @@ class HomeFragment : Fragment() {
                 val formattedLength = String.format("%.3f", length)
                 val formattedWidth = String.format("%.3f", width)
                 val formattedHeight = String.format("%.3f", height)
+                val volume = formattedLength+'x'+formattedWidth+'x'+formattedHeight
                 // bind TextViews
                 val productIdTextView = binding.productID
                 val productNameTextView = binding.productName
                 val weightTextView = binding.weight
-                val lengthTextView = binding.length
-                val widthTextView = binding.width
-                val heightTextView = binding.heigth
+                val volumeTextView = binding.volume
                 val brandTextView = binding.brand
                 // Update TextViews
-                productIdTextView.text = productID
-                productNameTextView.text = productName
-                weightTextView.text = formattedWeight
-                lengthTextView.text = formattedLength
-                widthTextView.text = formattedWidth
-                heightTextView.text = formattedHeight
-                brandTextView.text = brand
+                productIdTextView.setText(productID)
+                productNameTextView.setText(productName)
+                weightTextView.setText(formattedWeight)
+                volumeTextView.text = volume
+                brandTextView.setText(brand)
+
             },
             { error ->
                 // Errors here
