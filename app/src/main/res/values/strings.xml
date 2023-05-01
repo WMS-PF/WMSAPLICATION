@@ -15,4 +15,25 @@
     <string name="multiplier">X</string>
     <string name="Inbond">In bond</string>
     <string name="Nacional">Nacional</string>
+    <string name="ingreso_de_producto">Ingreso de Producto</string>
+    <string name="nombre_del_producto">Nombre del producto</string>
+    <string name="confirmar">Confirmar</string>
+    <string name="escanear_c_digo">Código</string>
+    <string name="brand">Elite</string>
+    <string name="prductname">Taladro</string>
+    <string name="weight">50</string>
+    <string name="marca">Marca</string>
+    <string name="peso">Peso</string>
+    <string name="barcode">Código de Barra</string>
+    <string name="volume">Volume</string>
+    <string name="serialcode">Código de Serial</string>
+    <string name="volumen">0x0x0</string>
+    <string name="n">pendiente\n</string>
+    <string name="numb">number</string>
+    <string name="OrdenIngreso">Orden de Ingreso: </string>
+    <string name="OrdenIdent">0000</string>
+    <string name="TotalLength">Total productos: </string>
+    <string name="LngitudPedidoO">100</string>
+    <string name="ScannerB">Código</string>
+    <string name="Confirmar">Confirmar</string>
 </resources>

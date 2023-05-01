@@ -72,7 +72,7 @@ class HomeFragment : Fragment() {
     private fun getInfo(productId: String){
         val queue = Volley.newRequestQueue(context)
         val jsonObject = JsonArrayRequest(
-            "http://191.109.26.82:3000/api/getProduct?productID=$productId",
+            "http://52.4.150.68/api/getProduct?productID=$productId",
             { response ->
                 val jsonObject = response.getJSONObject(0)
                 // Process the JSON object here
@@ -87,10 +87,10 @@ class HomeFragment : Fragment() {
                 val height = jsonObject.getString("Height").toDouble()
                 val brand = jsonObject.getString("Brand")
 
-                val formattedWeight = String.format("%.3f", weight)
-                val formattedLength = String.format("%.3f", length)
-                val formattedWidth = String.format("%.3f", width)
-                val formattedHeight = String.format("%.3f", height)
+                val formattedWeight = String.format("%.0f", weight)
+                val formattedLength = String.format("%.0f", length)
+                val formattedWidth = String.format("%.0f", width)
+                val formattedHeight = String.format("%.0f", height)
                 val volume = formattedLength+'x'+formattedWidth+'x'+formattedHeight
                 // bind TextViews
                 val productIdTextView = binding.productID
@@ -100,9 +100,10 @@ class HomeFragment : Fragment() {
                 val brandTextView = binding.brand
                 // Update TextViews
                 productIdTextView.setText(productID)
+
                 productNameTextView.setText(productName)
                 weightTextView.setText(formattedWeight)
-                volumeTextView.text = volume
+                volumeTextView.setText(volume)
                 brandTextView.setText(brand)
 
             },
