@@ -10,6 +10,8 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import com.finalproyect.wmsaplication.ui.gallery.GalleryViewModel
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.google.zxing.client.android.BeepManager
@@ -33,6 +35,7 @@ class ContinuousCaptureActivity : Activity() {
         const val EXTRA_SCANNED_RESULTS = "scanned_results"
         private const val STATE_SCANNED_RESULTS = "state_scanned_results"
     }
+    private lateinit var viewModel: GalleryViewModel
 
     private var scannedResults: MutableList<String> = mutableListOf()
     private val callback: BarcodeCallback = object : BarcodeCallback {
@@ -40,7 +43,7 @@ class ContinuousCaptureActivity : Activity() {
         private val SCAN_INTERVAL = 1300L // 3 segundos
 
         override fun barcodeResult(result: BarcodeResult) {
-            scannedResults.addAll(intent.getStringArrayExtra(EXTRA_RESULT)?.toList() ?: emptyList())
+
 
             if (result.text.isNullOrEmpty() && result.text == scannedResults[scannedResults.lastIndex]) {
                 return
@@ -63,24 +66,30 @@ class ContinuousCaptureActivity : Activity() {
             // Obtener el JSONArray de productos
             val productObject = orderInfo?.getJSONObject("Products")
             val iterator = productObject?.keys()
-            //get each key and its value
+
             var isCodeValid = false
+            var correspondingQuantity = 0 // Almacena la cantidad del producto correspondiente a result.text
+
             if (iterator != null) {
                 while (iterator.hasNext()) {
                     val productId = iterator.next() as String
                     val quantity = productObject.getInt(productId)
-                    if (scannedResults.count { it == result.text } > quantity) {
-                        // si el código escaneado ya se encuentra en la lista más de la cantidad permitida, no agregarlo
-                        barcodeView!!.setStatusText("El código escaneado ya se encuentra en la lista más de la cantidad permitida")
-                        isCodeValid = true
-                        break
-                    }
+
                     if (productId == result.text) {
                         isCodeValid = true
+                        correspondingQuantity = quantity // Almacena la cantidad del producto correspondiente a result.text
                         break
                     }
                 }
-                if (!isCodeValid){
+
+                // Mueve la verificación del conteo fuera del bucle while
+                if (isCodeValid && scannedResults.count { it == result.text } >= correspondingQuantity) {
+                    // Si el código escaneado ya se encuentra en la lista igual o más de la cantidad permitida, no agregarlo
+                    barcodeView!!.setStatusText("El código escaneado ya se encuentra en la lista igual o más de la cantidad permitida")
+                    isCodeValid = false
+                }
+
+                if (!isCodeValid) {
                     return
                 }
             }
@@ -88,10 +97,10 @@ class ContinuousCaptureActivity : Activity() {
             if (isCodeValid) {
             // Escanear el código
             scannedResults.add(result.text)
-            intent.putExtra(EXTRA_RESULT, scannedResults.toTypedArray())
+            intent.putExtra("Scanned", scannedResults.toTypedArray())
             Log.d("ScanTag", "resultado =$scannedResults")
             barcodeView!!.setStatusText(result.text)
-            beepManager!!.playBeepSoundAndVibrate()
+            //beepManager!!.playBeepSoundAndVibrate()
 
             // Pausar el escaneo durante un tiempo
             barcodeView!!.pause()
@@ -111,7 +120,7 @@ class ContinuousCaptureActivity : Activity() {
     }
     override fun onBackPressed() {
         val intent = Intent().apply {
-            putExtra(EXTRA_RESULT, scannedResults.toTypedArray())
+            putExtra("Scanned", scannedResults.toTypedArray())
         }
         setResult(Activity.RESULT_OK, intent)
         super.onBackPressed()
@@ -120,8 +129,11 @@ class ContinuousCaptureActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.continuous_scan)
         barcodeView = findViewById<DecoratedBarcodeView>(R.id.barcode_scanner)
+        val scannedResultsArray = intent.getStringArrayExtra("Scanned")
+        if (scannedResultsArray != null) {
+            scannedResults.addAll(scannedResultsArray)
+        }
         // Obtener la lista de resultados escaneados del intent
-        val scannedResultsArray = intent.getStringArrayExtra(EXTRA_SCANNED_RESULTS)
 
 // Inicializar la lista local de resultados escaneados con los valores del intent
         val formats: Collection<BarcodeFormat> =

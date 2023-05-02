@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -72,19 +73,30 @@ class GalleryFragment : Fragment() {
                 binding.OrdenID.text = orderInfo?.getString("OrderID") ?: "0000"
             }
         }
-        viewModel.productArray.observe(viewLifecycleOwner){ jsonArray ->
-            if (jsonArray != null){
-                val itemAdapter = ItemAdapter(requireContext(),jsonArray)
+        viewModel.updatedProductArray.observe(viewLifecycleOwner) { updatedArray ->
+            if (updatedArray != null) {
+                val itemAdapter = ItemAdapter(requireContext(), updatedArray)
                 recyclerView.adapter = itemAdapter
             }
         }
+
         viewModel.scannedResults.observe(viewLifecycleOwner){ resultString ->
             if (resultString != null){
                 scannedResults = resultString.toMutableList()
             }
         }
+
         val scanButton = binding.ScannerButton
         scanButton.setOnClickListener {_: View? ->startScan() }
+        binding.elevatedButton.setOnClickListener {
+            if (isAllProductsScanned()) {
+                // TODO: Navegar al siguiente fragment si todos los productos han sido escaneados
+                val jsonArray = createPostData(scannedResults, orderInfo!!)
+                sendPostRequest(jsonArray)
+            } else {
+                Toast.makeText(requireContext(), "Todavía quedan productos pendientes por escanear", Toast.LENGTH_SHORT).show()
+            }
+        }
         return root
     }
 
@@ -97,11 +109,12 @@ class GalleryFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 Log.d("ScanTag", "activity ended $result")
                     val data: Intent? = result.data
-                    val resultString = data?.getStringArrayExtra(EXTRA_RESULT)
+                    val resultString = data?.getStringArrayExtra("Scanned")
                     if (resultString != null) {
-                        scannedResults.addAll(resultString)
-                        Log.d("ScanTag", "startScan() called. scannedResults: $scannedResults")
+                        scannedResults = resultString.toMutableList()
+                        Log.d("ScanTag", "Resultados adquiridos del activity finalizado. scannedResults: $scannedResults")
                         viewModel.updateScannedResults(scannedResults)
+                        viewModel.updateProductQuantities(scannedResults)
                     }
             }
     private fun startScan() {
@@ -112,6 +125,63 @@ class GalleryFragment : Fragment() {
         Log.d("ScanTag", "startScan() called. scannedResults: $scannedResults")
         scanContinuous.launch(intent)
 
+    }
+    private fun isAllProductsScanned(): Boolean {
+        val updatedArray = viewModel.updatedProductArray.value ?: return false
+
+        for (i in 0 until updatedArray.length()) {
+            val product = updatedArray.getJSONObject(i)
+            if (product.getInt("Cantidad") != 0) {
+                return false
+            }
+        }
+
+        return true
+    }
+    fun createPostData(scannedResults: List<String>, orderInfo: JSONObject): JSONArray {
+        val jsonArray = JSONArray()
+        val inDate = orderInfo.getString("InDate")
+        val inID = orderInfo.getString("OrderID")
+
+        for (productId in scannedResults) {
+            val jsonObject = JSONObject()
+            jsonObject.put("ProductID", productId)
+            jsonObject.put("SerialID", null)
+            jsonObject.put("Status", 0)
+            jsonObject.put("InDate", inDate)
+            jsonObject.put("OutDate", null)
+            jsonObject.put("InID", inID)
+            jsonObject.put("OutID", null)
+
+            jsonArray.put(jsonObject)
+        }
+
+        return jsonArray
+    }
+    fun sendPostRequest(jsonArray: JSONArray) {
+        val url = "http://52.4.150.68/api/postUProduct"
+
+        val requestQueue = Volley.newRequestQueue(context)
+        val jsonArrayRequest = object : JsonArrayRequest(
+            Method.POST, url, jsonArray,
+            Response.Listener { response ->
+                // Procesar la respuesta del servidor
+                Log.d("PostRequest", "Respuesta del servidor: $response")
+            },
+            Response.ErrorListener { error ->
+                // Manejar errores
+                Log.e("PostRequest", "Error en la solicitud POST", error)
+            }
+        ) {
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Content-Type"] = "application/json"
+                // Agrega otros encabezados si es necesario
+                return headers
+            }
+        }
+
+        requestQueue.add(jsonArrayRequest)
     }
     //Get Info of an open incoming order
     private fun getOrderInfo(callback: (JSONObject,JSONArray) -> Unit) {

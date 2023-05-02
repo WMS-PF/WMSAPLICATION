@@ -36,4 +36,5 @@
     <string name="LngitudPedidoO">100</string>
     <string name="ScannerB">Código</string>
     <string name="Confirmar">Confirmar</string>
+    <string name="OrdenDespacho">Orden de Despacho</string>
 </resources>
