@@ -140,7 +140,7 @@ class GalleryFragment : Fragment() {
     }
     fun createPostData(scannedResults: List<String>, orderInfo: JSONObject): JSONArray {
         val jsonArray = JSONArray()
-        val inDate = orderInfo.getString("InDate")
+        val inDate = orderInfo.getString("Date")
         val inID = orderInfo.getString("OrderID")
 
         for (productId in scannedResults) {
@@ -149,9 +149,9 @@ class GalleryFragment : Fragment() {
             jsonObject.put("SerialID", null)
             jsonObject.put("Status", 0)
             jsonObject.put("InDate", inDate)
-            jsonObject.put("OutDate", null)
+            jsonObject.put("OutDate", "2023-04-27")
             jsonObject.put("InID", inID)
-            jsonObject.put("OutID", null)
+            jsonObject.put("OutID", "12384")
 
             jsonArray.put(jsonObject)
         }

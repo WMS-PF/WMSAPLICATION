@@ -16,6 +16,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.android.volley.Request
+import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -89,6 +91,7 @@ class SlideshowFragment : Fragment() {
         binding.elevatedButton2.setOnClickListener {
             if (isAllProductsScanned()) {
                 // Navegar al siguiente fragment si todos los productos han sido escaneados
+                    updateProducts()
             } else {
                 Toast.makeText(requireContext(), "Todavía quedan productos pendientes por escanear", Toast.LENGTH_SHORT).show()
             }
@@ -133,6 +136,47 @@ class SlideshowFragment : Fragment() {
         }
 
         return true
+    }
+    fun updateProducts() {
+        // 1. Crear JSONArray con información actualizada de los productos
+        val updatedProducts = JSONArray()
+        val outDate = orderInfo?.getString("Date") // Reemplazar con la fecha de salida real
+        val outID = orderInfo?.getString("OrderID") // Reemplazar con el ID de la orden real
+
+        for (product in scannedResults) {
+            val updatedProduct = JSONObject()
+            updatedProduct.put("ProductID", product)
+            updatedProduct.put("Status", 3) // Actualizar el estado
+            updatedProduct.put("OutDate", outDate)
+            updatedProduct.put("OutID", outID)
+
+            updatedProducts.put(updatedProduct)
+        }
+
+        // 2. Enviar solicitud HTTP PUT para actualizar los productos en la base de datos
+        val url = "http://52.4.150.68/api/UpdateUProduct" // Reemplazar con la URL real de tu API
+        val requestQueue = Volley.newRequestQueue(requireContext())
+
+        val jsonArrayRequest = object : JsonArrayRequest(
+            Method.PUT,
+            url,
+            updatedProducts,
+            Response.Listener { response ->
+                // Manejar la respuesta exitosa aquí
+                Toast.makeText(requireContext(), "Productos actualizados con éxito", Toast.LENGTH_SHORT).show()
+            },
+            Response.ErrorListener { error ->
+                // Manejar el error aquí
+                Toast.makeText(requireContext(), "Error al actualizar los productos: ${error.message}", Toast.LENGTH_SHORT).show()
+            }
+        ) {
+            override fun getHeaders(): MutableMap<String, String> {
+                // Agregar encabezados necesarios aquí, por ejemplo, un token de autenticación
+                return HashMap()
+            }
+        }
+
+        requestQueue.add(jsonArrayRequest)
     }
     //Get Info of an open incoming order
     private fun getOrderInfo(callback: (JSONObject, JSONArray) -> Unit) {
