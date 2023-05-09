@@ -29,8 +29,8 @@ class ItemAdapter(val context: Context, val items: JSONArray) : RecyclerView.Ada
         }else{
             holder.container.setBackgroundColor(Color.parseColor("#90909A"))
         }
-        holder.productNombre.text = item.getString("Product_Name")
-        holder.IDproducto.text = item.getString("Product_ID")
+        holder.productNombre.text = item.getString("ProductName")
+        holder.IDproducto.text = item.getString("ItemCode")
         holder.productBrand.text = item.getString("Brand")
         holder.quantity.text = item.getString("Cantidad")
         // Por ejemplo: holder.title.text = items[position].title

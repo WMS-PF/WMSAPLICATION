@@ -20,6 +20,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.finalproyect.wmsaplication.ContinuousCaptureActivity
 import com.finalproyect.wmsaplication.R
@@ -91,7 +92,11 @@ class SlideshowFragment : Fragment() {
         binding.elevatedButton2.setOnClickListener {
             if (isAllProductsScanned()) {
                 // Navegar al siguiente fragment si todos los productos han sido escaneados
-                    updateProducts()
+                var jsonArray = orderInfo?.let { it1 -> createPostData(scannedResults, it1) }
+                if (jsonArray != null) {
+                    Log.d("UpdateTag", "activity ended $jsonArray")
+                    updateProducts(jsonArray)
+                }
             } else {
                 Toast.makeText(requireContext(), "Todavía quedan productos pendientes por escanear", Toast.LENGTH_SHORT).show()
             }
@@ -131,52 +136,60 @@ class SlideshowFragment : Fragment() {
         for (i in 0 until updatedArray.length()) {
             val product = updatedArray.getJSONObject(i)
             if (product.getInt("Cantidad") != 0) {
-                return false
+                return true
             }
         }
 
         return true
     }
-    fun updateProducts() {
-        // 1. Crear JSONArray con información actualizada de los productos
-        val updatedProducts = JSONArray()
-        val outDate = orderInfo?.getString("Date") // Reemplazar con la fecha de salida real
-        val outID = orderInfo?.getString("OrderID") // Reemplazar con el ID de la orden real
+    fun createPostData(scannedResults: List<String>, orderInfo: JSONObject): JSONArray {
+        val jsonArray = JSONArray()
+        val OutDate = orderInfo.getString("Date")
+        val OutID = orderInfo.getString("OrderID")
 
-        for (product in scannedResults) {
-            val updatedProduct = JSONObject()
-            updatedProduct.put("ProductID", product)
-            updatedProduct.put("Status", 3) // Actualizar el estado
-            updatedProduct.put("OutDate", outDate)
-            updatedProduct.put("OutID", outID)
+        for (productId in scannedResults) {
+            val jsonObject = JSONObject()
+            jsonObject.put("ItemCode", productId)
+            jsonObject.put("SerialCode", null)
+            jsonObject.put("Status", 3)
+            jsonObject.put("OutDate", OutDate)
+            jsonObject.put("OutID", OutID)
 
-            updatedProducts.put(updatedProduct)
+            jsonArray.put(jsonObject)
+            Log.d("PostRequest", "$jsonArray")
         }
 
-        // 2. Enviar solicitud HTTP PUT para actualizar los productos en la base de datos
-        val url = "http://52.4.150.68/api/UpdateUProduct" // Reemplazar con la URL real de tu API
-        val requestQueue = Volley.newRequestQueue(requireContext())
+        return jsonArray
+    }
+    fun  updateProducts(jsonArray: JSONArray) {
+        val url = "http://52.4.150.68/api/UpdateUProduct"
 
-        val jsonArrayRequest = object : JsonArrayRequest(
-            Method.PUT,
-            url,
-            updatedProducts,
+        val requestQueue = Volley.newRequestQueue(context)
+        val stringRequest = object : StringRequest(
+            Method.PUT, url,
             Response.Listener { response ->
-                // Manejar la respuesta exitosa aquí
-                Toast.makeText(requireContext(), "Productos actualizados con éxito", Toast.LENGTH_SHORT).show()
+                // Procesar la respuesta del servidor
+                Log.d("PostRequest", "Respuesta del servidor: $response")
+                Log.d("PostRequest", "$jsonArray")
             },
             Response.ErrorListener { error ->
-                // Manejar el error aquí
-                Toast.makeText(requireContext(), "Error al actualizar los productos: ${error.message}", Toast.LENGTH_SHORT).show()
+                // Manejar errores
+                Log.e("PostRequest", "Error en la solicitud PUT", error)
             }
         ) {
             override fun getHeaders(): MutableMap<String, String> {
-                // Agregar encabezados necesarios aquí, por ejemplo, un token de autenticación
-                return HashMap()
+                val headers = HashMap<String, String>()
+                headers["Content-Type"] = "application/json"
+                // Agrega otros encabezados si es necesario
+                return headers
+            }
+
+            override fun getBody(): ByteArray {
+                return jsonArray.toString().toByteArray()
             }
         }
 
-        requestQueue.add(jsonArrayRequest)
+        requestQueue.add(stringRequest)
     }
     //Get Info of an open incoming order
     private fun getOrderInfo(callback: (JSONObject, JSONArray) -> Unit) {
@@ -213,7 +226,7 @@ class SlideshowFragment : Fragment() {
                         //gets one jsonObject from the array
                         val jsonObjeto = jsonArray.getJSONObject(i)
                         //searches the quantity of that product and adds it to the products array
-                        jsonObjeto.put("Cantidad", productsJSON.getInt(jsonObjeto.getString("Product_ID")))
+                        jsonObjeto.put("Cantidad", productsJSON.getInt(jsonObjeto.getString("ItemCode")))
                         productos.put(jsonObjeto)
                     }
                     orderInfo = response

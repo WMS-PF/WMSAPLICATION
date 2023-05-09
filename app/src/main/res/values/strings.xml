@@ -37,4 +37,5 @@
     <string name="ScannerB">Código</string>
     <string name="Confirmar">Confirmar</string>
     <string name="OrdenDespacho">Orden de Despacho</string>
+    <string name="quantity_hint">20</string>
 </resources>

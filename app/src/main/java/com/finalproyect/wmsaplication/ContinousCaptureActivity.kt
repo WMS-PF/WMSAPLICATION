@@ -8,10 +8,13 @@ import android.os.Looper
 import android.speech.RecognizerIntent.EXTRA_RESULTS
 import android.util.Log
 import android.view.KeyEvent
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.finalproyect.wmsaplication.ui.gallery.GalleryViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.google.zxing.client.android.BeepManager
@@ -55,7 +58,7 @@ class ContinuousCaptureActivity : Activity() {
                 return
             }
             // Verificar la longitud del resultado escaneado
-            if (result.text.length != 18) {
+            if (result.text.length > 20) {
                 // Si el resultado no tiene exactamente 18 caracteres, no lo agregue a la lista de resultados
                 barcodeView!!.setStatusText("El código escaneado no es valido")
                 return
@@ -96,14 +99,36 @@ class ContinuousCaptureActivity : Activity() {
 
             if (isCodeValid) {
             // Escanear el código
-            scannedResults.add(result.text)
-            intent.putExtra("Scanned", scannedResults.toTypedArray())
-            Log.d("ScanTag", "resultado =$scannedResults")
-            barcodeView!!.setStatusText(result.text)
+            //scannedResults.add(result.text)
+
             //beepManager!!.playBeepSoundAndVibrate()
 
             // Pausar el escaneo durante un tiempo
             barcodeView!!.pause()
+                val inflater = LayoutInflater.from(this@ContinuousCaptureActivity)
+                val dialogView = inflater.inflate(R.layout.dialog_text, null)
+                val editTextQuantity = dialogView.findViewById<EditText>(R.id.editTextQuantity)
+
+                MaterialAlertDialogBuilder(this@ContinuousCaptureActivity)
+                    .setTitle("Cantidad")
+                    .setView(dialogView)
+                    .setMessage("indique la cantidad del producto "+ result.text)
+                    .setPositiveButton("Aceptar") { dialog, which ->
+                        // Respond to positive button press
+                        val quantity = editTextQuantity.text.toString().toIntOrNull()
+                        if (quantity != null) {
+                            for (i in 1..quantity){
+                                scannedResults.add(result.text)
+                            }
+                            intent.putExtra("Scanned", scannedResults.toTypedArray())
+                            Log.d("ScanTag", "resultado =$scannedResults")
+                            barcodeView!!.setStatusText(result.text)
+                            // Do something with the entered quantity
+                        } else {
+                            // Handle invalid input
+                        }
+                    }
+                    .show()
             Handler(Looper.getMainLooper()).postDelayed({
                 // Reanudar el escaneo después de la pausa
                 barcodeView!!.resume()

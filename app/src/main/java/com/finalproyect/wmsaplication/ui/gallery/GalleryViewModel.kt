@@ -41,7 +41,7 @@ class GalleryViewModel : ViewModel() {
 
         for (i in 0 until originalArray.length()) {
             val product = originalArray.getJSONObject(i)
-            val productId = product.getString("Product_ID")
+            val productId = product.getString("ItemCode")
             val originalQuantity = product.getInt("Cantidad")
             val scannedCount = scannedResults.count { it == productId }
 

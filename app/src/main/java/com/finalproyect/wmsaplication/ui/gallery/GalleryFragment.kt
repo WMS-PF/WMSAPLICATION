@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.finalproyect.wmsaplication.ContinuousCaptureActivity
 import com.finalproyect.wmsaplication.ContinuousCaptureActivity.Companion.EXTRA_RESULT
@@ -131,8 +132,8 @@ class GalleryFragment : Fragment() {
 
         for (i in 0 until updatedArray.length()) {
             val product = updatedArray.getJSONObject(i)
-            if (product.getInt("Cantidad") != 0) {
-                return false
+            if (product.getInt("Cantidad") > 0) {
+                return true
             }
         }
 
@@ -145,15 +146,16 @@ class GalleryFragment : Fragment() {
 
         for (productId in scannedResults) {
             val jsonObject = JSONObject()
-            jsonObject.put("ProductID", productId)
-            jsonObject.put("SerialID", null)
+            jsonObject.put("ItemCode", productId)
+            jsonObject.put("SerialCode", null)
             jsonObject.put("Status", 0)
             jsonObject.put("InDate", inDate)
             jsonObject.put("OutDate", "2023-04-27")
             jsonObject.put("InID", inID)
-            jsonObject.put("OutID", "12384")
+            jsonObject.put("OutID", "1")
 
             jsonArray.put(jsonObject)
+            Log.d("PostRequest", "$jsonArray")
         }
 
         return jsonArray
@@ -162,11 +164,12 @@ class GalleryFragment : Fragment() {
         val url = "http://52.4.150.68/api/postUProduct"
 
         val requestQueue = Volley.newRequestQueue(context)
-        val jsonArrayRequest = object : JsonArrayRequest(
-            Method.POST, url, jsonArray,
+        val stringRequest = object : StringRequest(
+            Method.POST, url,
             Response.Listener { response ->
                 // Procesar la respuesta del servidor
                 Log.d("PostRequest", "Respuesta del servidor: $response")
+                Log.d("PostRequest", "$jsonArray")
             },
             Response.ErrorListener { error ->
                 // Manejar errores
@@ -179,9 +182,13 @@ class GalleryFragment : Fragment() {
                 // Agrega otros encabezados si es necesario
                 return headers
             }
+
+            override fun getBody(): ByteArray {
+                return jsonArray.toString().toByteArray()
+            }
         }
 
-        requestQueue.add(jsonArrayRequest)
+        requestQueue.add(stringRequest)
     }
     //Get Info of an open incoming order
     private fun getOrderInfo(callback: (JSONObject,JSONArray) -> Unit) {
@@ -218,7 +225,7 @@ class GalleryFragment : Fragment() {
                         //gets one jsonObject from the array
                         val jsonObjeto = jsonArray.getJSONObject(i)
                         //searches the quantity of that product and adds it to the products array
-                        jsonObjeto.put("Cantidad", productsJSON.getInt(jsonObjeto.getString("Product_ID")))
+                        jsonObjeto.put("Cantidad", productsJSON.getInt(jsonObjeto.getString("ItemCode")))
                         productos.put(jsonObjeto)
                     }
                     orderInfo = response
